@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from gradio_client import Client
 
 app = Flask(__name__)
@@ -6,6 +6,17 @@ app = Flask(__name__)
 # Connect to your Space
 client = Client("SiddharthHanje/Gradio_UI")  # your Space repo name
 
+# Page wont load on its own, copy url in browser
+@app.route('/') 
+def start():
+    return render_template('start.html')
+
+# Home route to handle GET request from the starting page
+@app.route('/home', methods=['GET'])
+def home():
+    return render_template('home.html')
+
+# Route to handle POST request from the interface(yet to be)
 @app.route("/home", methods=["POST"])
 def text_to_sql():
     body = request.json
