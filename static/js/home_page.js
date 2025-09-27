@@ -81,11 +81,42 @@ Language_Form.addEventListener("submit",  async function(event){
         alert("Request sent and server responded with status: " + response.status);
 
         const result = await response.json();
-        console.log("SQL result:", result.sql);
-        alert("Generated SQL: " + result.sql);
+        const sql_query = result.sql;
+
+        alert("Generated SQL: " + sql_query);
+        const outputBox = document.querySelector("#output");
+        outputBox.value = sql_query || "No SQL returned.";
+
+        const visualizeButton = document.querySelector("#visualize_button");
+        visualizeButton.disabled = false;  // Enable the button now
 
     } catch (error) {
         alert("Error occurred while fetching:" + error);
     }
 
 });
+
+const visualizeButton = document.querySelector("#visualize_button");
+
+visualizeButton.addEventListener("click", async function() {
+    try {
+        const response = await fetch('/run_sql');  
+
+        if (!response.ok) {
+            alert("Visualization failed: " + response.status);
+            return;
+        }
+        alert("Visualization triggered successfully.");
+        const result = await response.json();
+        const imageUrl = result.plot_url;
+
+        const plotImage = document.querySelector("#plot_image");
+        const timestamp = new Date().getTime(); 
+        plotImage.src = `/${imageUrl}?t=${timestamp}`;
+        plotImage.alt = "Generated Visualization";
+
+    } catch (error) {
+        alert("Error during visualization: " + error);
+    }
+});
+
