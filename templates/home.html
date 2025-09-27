@@ -6,7 +6,6 @@
 </head>
 <body>
     <h1>Interface Page</h1>
-    <p>This is the interface page.</p>
 
     <div>   
         <form id="Language_Form">
@@ -18,10 +17,17 @@
 
             <button type="submit">Run</button>
         </form>
-    </div>
 
+        <div>
+            <p><strong>Generated SQL:</strong></p>
+            <textarea id="output" rows="5" cols="50" readonly></textarea>
+        </div>
+        <div>
+            <button type="button" id="visualize_button" disabled>Visualize</button>
 
+            <img id="plot_image" src="" alt="Visualization" style="display:none">
 
+        </div>
 
     <script src="../static/js/home_page.js" charset="utf-8"></script>
 </body>
