@@ -1,10 +1,4 @@
 
-document.addEventListener("keypress", function(event){
-    if(event.key === "Enter"){
-        alert("Key pressed");     
-    }
-});
-
 const Language_Form = document.querySelector("#Language_Form");
 
 Language_Form.addEventListener("submit",  async function(event){
@@ -83,7 +77,7 @@ Language_Form.addEventListener("submit",  async function(event){
         const result = await response.json();
         const sql_query = result.sql;
 
-        alert("Generated SQL: " + sql_query);
+    
         const outputBox = document.querySelector("#output");
         outputBox.value = sql_query || "No SQL returned.";
 
