@@ -73,6 +73,16 @@ def run_sql_query():
 
 # Plotting the DataFrame
     df = pd.DataFrame(results)
+    # Auto-infer column types
+    for col in df.columns:
+        try:
+            df[col] = pd.to_numeric(df[col])
+        except:
+            try:
+                df[col] = pd.to_datetime(df[col])
+            except:
+                df[col] = df[col].astype("category")
+
     cols = df.columns.tolist()
     num_cols = len(cols)
 
@@ -80,14 +90,14 @@ def run_sql_query():
 
     if num_cols == 1:
         col = cols[0]
-        if df[col].dtype.kind in "biufc":  # numeric types
+        if pd.api.types.is_numeric_dtype(df[col]): # numeric types
             plt.hist(df[col], bins="auto")
             plt.xlabel(col)
             plt.ylabel("Frequency")
             plt.title(f"Distribution of {col}")
         else:  # categorical or text
             counts = df[col].value_counts()
-            plt.bar(counts.index, counts.values)
+            plt.bar(counts.index, counts.values) # Note: Can also use piechart
             plt.xlabel(col)
             plt.ylabel("Count")
             plt.title(f"Frequency of {col}")
@@ -95,11 +105,34 @@ def run_sql_query():
 
     elif num_cols == 2:
         x, y = cols
-        plt.bar(df[x], df[y])
-        plt.xlabel(x)
-        plt.ylabel(y)
-        plt.title(f"{y} vs {x}")
-        plt.xticks(rotation=90)
+        # Determine types and plot accordingly
+        
+        # Categorical + Numerical → Use a Bar Chart
+        if pd.api.types.is_numeric_dtype(df[y]) and pd.api.types.is_categorical_dtype(df[x]):
+            plt.bar(df[x], df[y]) # Bar chart with categorical on x-axis
+            plt.xlabel(x)
+            plt.ylabel(y)
+            plt.title(f"{y} vs {x}")
+            plt.xticks(rotation=90)
+        elif pd.api.types.is_numeric_dtype(df[x]) and pd.api.types.is_categorical_dtype(df[y]):
+            plt.bar(df[y], df[x])  # Swapped to keep categorical on x-axis
+            plt.xlabel(y)
+            plt.ylabel(x)
+            plt.title(f"{x} vs {y}")
+            plt.xticks(rotation=90)  
+        
+        # Numerical + Numerical → Use a Scatter Plot
+        elif pd.api.types.is_numeric_dtype(df[x]) and pd.api.types.is_numeric_dtype(df[y]):
+            plt.scatter(df[x], df[y])
+            plt.xlabel(x)
+            plt.ylabel(y)
+            plt.title(f"{y} vs {x}")
+            plt.xticks(rotation=90)
+
+        # Categorical + Categorical → Use a Frequency Chart (e.g., grouped bar or heatmap)    
+        elif pd.api.types.is_categorical_dtype(df[x]) and pd.api.types.is_categorical_dtype(df[y]):
+            pass  # More complex plotting needed, skipping for simplicity
+  
 
     elif num_cols == 3:
         x, y, hue = cols
@@ -121,3 +154,6 @@ def run_sql_query():
     return jsonify({"plot_url": "static/images/plot.png"})
 if __name__ == "__main__":
     app.run(port=3000)
+
+
+
